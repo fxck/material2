@@ -1,14 +1,12 @@
-import {Injector, ComponentRef, Injectable, Optional, SkipSelf, NgZone} from '@angular/core';
+import {Injector, ComponentRef, Injectable, Optional, SkipSelf, TemplateRef} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
-
 import {
   Overlay,
   OverlayRef,
   ComponentType,
   OverlayState,
-  ComponentPortal,
-  TemplatePortal
+  ComponentPortal
 } from '../core';
 import {extendObject} from '../core/util/object-extend';
 
@@ -56,7 +54,6 @@ export class MdDialog {
   constructor(
       private _overlay: Overlay,
       private _injector: Injector,
-      private _zone: NgZone,
       @Optional() @SkipSelf() private _parentDialog: MdDialog) { }
 
   /**
@@ -65,7 +62,7 @@ export class MdDialog {
    * @param config Extra configuration options.
    * @returns Reference to the newly-opened dialog.
    */
-  openFromPortal(templatePortal: TemplatePortal, config?: MdDialogConfig) {
+  openFromTemplateRef(templateRef: TemplateRef<any>, config?: MdDialogConfig): MdDialogRef<any> {
     config = _applyConfigDefaults(config);
 
     let overlayRef = this._createOverlay(config);
@@ -75,7 +72,7 @@ export class MdDialog {
       dialogContainer,
       overlayRef,
       undefined,
-      templatePortal,
+      templateRef,
       config
     );
 
@@ -166,7 +163,7 @@ export class MdDialog {
       dialogContainer: MdDialogContainer,
       overlayRef: OverlayRef,
       component?: ComponentType<T>,
-      templatePortal?: TemplatePortal,
+      templateRef?: TemplateRef<T>,
       config?: MdDialogConfig): MdDialogRef<T> {
     // Create a reference to the dialog we're creating in order to give the user a handle
     // to modify and close it.
@@ -193,8 +190,8 @@ export class MdDialog {
       dialogRef.componentInstance = contentRef.instance;
     }
 
-    if (templatePortal) {
-      dialogContainer.attachTemplatePortal(templatePortal);
+    if (templateRef) {
+      dialogContainer.attachTemplateRef(templateRef);
     }
 
     return dialogRef;

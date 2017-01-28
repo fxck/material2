@@ -7,7 +7,7 @@ import {
 } from '../core';
 import {MdDialog} from './dialog';
 import {MdDialogContainer} from './dialog-container';
-import {MdDialogElement, MdDialogPortal} from './dialog-element';
+import {MdDialogElement} from './dialog-element';
 import {
   MdDialogClose,
   MdDialogContent,
@@ -29,7 +29,6 @@ import {
     MdDialogContent,
     MdDialogActions,
     MdDialogElement,
-    MdDialogPortal,
     CompatibilityModule,
   ],
   declarations: [
@@ -39,7 +38,6 @@ import {
     MdDialogActions,
     MdDialogContent,
     MdDialogElement,
-    MdDialogPortal,
   ],
   providers: [
     MdDialog,

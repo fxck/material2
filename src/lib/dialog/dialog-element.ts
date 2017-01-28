@@ -1,8 +1,6 @@
 import {
   Component,
-  Directive,
   TemplateRef,
-  ViewContainerRef,
   Input,
   ViewChild,
   Output,
@@ -11,16 +9,6 @@ import {
 } from '@angular/core';
 import {MdDialog} from './dialog';
 import {MdDialogRef} from './dialog-ref';
-import {TemplatePortal} from '../core';
-
-@Directive({
-  selector: '[mdDialogPortal]'
-})
-export class MdDialogPortal extends TemplatePortal {
-  constructor(templateRef: TemplateRef<any>, viewContainerRef: ViewContainerRef) {
-    super(templateRef, viewContainerRef);
-  }
-}
 
 @Component({
   selector: 'md-dialog',
@@ -33,15 +21,15 @@ export class MdDialogElement {
   @Output()
   close = new EventEmitter<void>(false);
 
-  @ViewChild(MdDialogPortal)
-  dialogPortal: MdDialogPortal;
+  @ViewChild('dialogTemplateRef')
+  dialogTemplateRef: TemplateRef<any>;
 
   @Input()
   set open(state: boolean) {
     if (state) {
       setTimeout(() => {
 
-        this.dialog = this._dialog.openFromPortal(this.dialogPortal, {
+        this.dialog = this._dialog.openFromTemplateRef(this.dialogTemplateRef, {
           disableClose: true
         });
 

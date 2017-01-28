@@ -3,7 +3,9 @@ import {
   ComponentRef,
   ViewChild,
   ViewEncapsulation,
+  TemplateRef,
   NgZone,
+  ViewContainerRef,
   OnDestroy
 } from '@angular/core';
 import {BasePortalHost, ComponentPortal, PortalHostDirective, TemplatePortal} from '../core';
@@ -46,7 +48,7 @@ export class MdDialogContainer extends BasePortalHost implements OnDestroy {
   /** Reference to the open dialog. */
   dialogRef: MdDialogRef<any>;
 
-  constructor(private _ngZone: NgZone) {
+  constructor(private _viewContainerRef: ViewContainerRef, private _ngZone: NgZone) {
     super();
   }
 
@@ -67,16 +69,21 @@ export class MdDialogContainer extends BasePortalHost implements OnDestroy {
   }
 
   /** @docs-private */
-  attachTemplatePortal(portal: TemplatePortal) {
+  attachTemplatePortal(templatePortal: TemplatePortal) {
     if (this._portalHost.hasAttached()) {
       throw new MdDialogContentAlreadyAttachedError();
     }
 
-    let attachResult = this._portalHost.attachTemplatePortal(portal);
+    let attachResult = this._portalHost.attachTemplatePortal(templatePortal);
 
     this._focusFirstTabbableElement();
 
     return attachResult;
+  }
+
+  attachTemplateRef(templateRef: TemplateRef<any>) {
+    const portal = new TemplatePortal(templateRef, this._viewContainerRef);
+    this.attachTemplatePortal(portal);
   }
 
   /**
