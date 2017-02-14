@@ -37,7 +37,8 @@ describe('MdSelect', () => {
         CompWithCustomSelect,
         SelectWithErrorSibling,
         ThrowsErrorOnInit,
-        BasicSelectOnPush
+        BasicSelectOnPush,
+        BasicSelectWithHeader,
       ],
       providers: [
         {provide: OverlayContainer, useFactory: () => {
@@ -136,6 +137,17 @@ describe('MdSelect', () => {
       fixture.detectChanges();
 
       expect(fixture.componentInstance.select.panelOpen).toBe(false);
+    });
+
+    it('should set an id on the select panel', () => {
+      trigger.click();
+      fixture.detectChanges();
+
+      const panel = document.querySelector('.cdk-overlay-pane .mat-select-content');
+      const instance = fixture.componentInstance.select;
+
+      expect(instance.panelId).toBeTruthy();
+      expect(panel.getAttribute('id')).toBe(instance.panelId);
     });
 
   });
@@ -648,19 +660,23 @@ describe('MdSelect', () => {
     let fixture: ComponentFixture<BasicSelect>;
     let trigger: HTMLElement;
     let select: HTMLElement;
+    let selectInstance: MdSelect;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(BasicSelect);
       fixture.detectChanges();
       trigger = fixture.debugElement.query(By.css('.mat-select-trigger')).nativeElement;
       select = fixture.debugElement.query(By.css('md-select')).nativeElement;
+      selectInstance = fixture.componentInstance.select;
     });
 
     /**
      * Asserts that the given option is aligned with the trigger.
      * @param index The index of the option.
+     * @param selectInstance Instance of MdSelect to use when asserting.
      */
     function checkTriggerAlignedWithOption(index: number): void {
+
       const overlayPane = overlayContainerElement.querySelector('.cdk-overlay-pane');
       const triggerTop = trigger.getBoundingClientRect().top;
       const overlayTop = overlayPane.getBoundingClientRect().top;
@@ -675,7 +691,7 @@ describe('MdSelect', () => {
       // For the animation to start at the option's center, its origin must be the distance
       // from the top of the overlay to the option top + half the option height (48/2 = 24).
       const expectedOrigin = optionTop - overlayTop + 24;
-      expect(fixture.componentInstance.select._transformOrigin)
+      expect(selectInstance._transformOrigin)
           .toContain(`${expectedOrigin}px`,
               `Expected panel animation to originate in the center of option ${index}.`);
     }
@@ -695,7 +711,7 @@ describe('MdSelect', () => {
         trigger.click();
         fixture.detectChanges();
 
-        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-panel');
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
 
         // The panel should be scrolled to 0 because centering the option is not possible.
         expect(scrollContainer.scrollTop).toEqual(0, `Expected panel not to be scrolled.`);
@@ -711,7 +727,7 @@ describe('MdSelect', () => {
         trigger.click();
         fixture.detectChanges();
 
-        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-panel');
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
 
         // The panel should be scrolled to 0 because centering the option is not possible.
         expect(scrollContainer.scrollTop).toEqual(0, `Expected panel not to be scrolled.`);
@@ -727,7 +743,7 @@ describe('MdSelect', () => {
         trigger.click();
         fixture.detectChanges();
 
-        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-panel');
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
 
         // The selected option should be scrolled to the center of the panel.
         // This will be its original offset from the scrollTop - half the panel height + half the
@@ -747,7 +763,7 @@ describe('MdSelect', () => {
         trigger.click();
         fixture.detectChanges();
 
-        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-panel');
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
 
         // The selected option should be scrolled to the max scroll position.
         // This will be the height of the scrollContainer - the panel height.
@@ -779,7 +795,7 @@ describe('MdSelect', () => {
         trigger.click();
         fixture.detectChanges();
 
-        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-panel');
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
 
         // Scroll should adjust by the difference between the top space available (85px + 8px
         // viewport padding = 77px) and the height of the panel above the option (113px).
@@ -802,7 +818,7 @@ describe('MdSelect', () => {
         trigger.click();
         fixture.detectChanges();
 
-        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-panel');
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
 
         // Scroll should adjust by the difference between the bottom space available
         // (686px - 600px margin - 30px trigger height = 56px - 8px padding = 48px)
@@ -829,7 +845,7 @@ describe('MdSelect', () => {
         const overlayPane = document.querySelector('.cdk-overlay-pane');
         const triggerBottom = trigger.getBoundingClientRect().bottom;
         const overlayBottom = overlayPane.getBoundingClientRect().bottom;
-        const scrollContainer = overlayPane.querySelector('.mat-select-panel');
+        const scrollContainer = overlayPane.querySelector('.mat-select-content');
 
         // Expect no scroll to be attempted
         expect(scrollContainer.scrollTop).toEqual(0, `Expected panel not to be scrolled.`);
@@ -856,7 +872,7 @@ describe('MdSelect', () => {
         const overlayPane = document.querySelector('.cdk-overlay-pane');
         const triggerTop = trigger.getBoundingClientRect().top;
         const overlayTop = overlayPane.getBoundingClientRect().top;
-        const scrollContainer = overlayPane.querySelector('.mat-select-panel');
+        const scrollContainer = overlayPane.querySelector('.mat-select-content');
 
         // Expect scroll to remain at the max scroll position
         expect(scrollContainer.scrollTop).toEqual(128, `Expected panel to be at max scroll.`);
@@ -1006,6 +1022,52 @@ describe('MdSelect', () => {
         expect(firstOptionRight.toFixed(2))
             .toEqual((triggerRight + 16).toFixed(2),
                 `Expected trigger to align with the selected option on the x-axis in RTL.`);
+      });
+    });
+
+    describe('with header', () => {
+      let headerFixture: ComponentFixture<BasicSelectWithHeader>;
+
+      beforeEach(() => {
+        headerFixture = TestBed.createComponent(BasicSelectWithHeader);
+        headerFixture.detectChanges();
+        trigger = headerFixture.debugElement.query(By.css('.mat-select-trigger')).nativeElement;
+        select = headerFixture.debugElement.query(By.css('md-select')).nativeElement;
+        selectInstance = headerFixture.componentInstance.select;
+
+        select.style.marginTop = '300px';
+        select.style.marginLeft = '20px';
+        select.style.marginRight = '20px';
+      });
+
+      it('should account for the header when there is no value', () => {
+        trigger.click();
+        headerFixture.detectChanges();
+
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
+
+        expect(scrollContainer.scrollTop).toEqual(0, `Expected panel not to be scrolled.`);
+        checkTriggerAlignedWithOption(0);
+      });
+
+      it('should align a selected option in the middle with the trigger text', () => {
+        // Select the fifth option, which has enough space to scroll to the center
+        headerFixture.componentInstance.control.setValue('chips-4');
+        headerFixture.detectChanges();
+
+        trigger.click();
+        headerFixture.detectChanges();
+
+        const scrollContainer = document.querySelector('.cdk-overlay-pane .mat-select-content');
+
+        // The selected option should be scrolled to the center of the panel.
+        // This will be its original offset from the scrollTop - half the panel height + half the
+        // option height. 4 (index) * 48 (option height) = 192px offset from scrollTop
+        // 192 - 256/2 + 48/2 = 88px
+        expect(scrollContainer.scrollTop)
+            .toEqual(88, `Expected overlay panel to be scrolled to center the selected option.`);
+
+        checkTriggerAlignedWithOption(4);
       });
     });
 
@@ -1524,6 +1586,38 @@ class BasicSelectOnPush {
     { value: 'tacos-2', viewValue: 'Tacos' },
   ];
   control = new FormControl();
+
+  @ViewChild(MdSelect) select: MdSelect;
+  @ViewChildren(MdOption) options: QueryList<MdOption>;
+}
+
+@Component({
+  selector: 'basic-select-with-header',
+  template: `
+    <md-select placeholder="Food" [formControl]="control">
+      <md-select-header>
+        <input placeholder="Search for food" />
+      </md-select-header>
+
+      <md-option *ngFor="let food of foods" [value]="food.value">
+        {{ food.viewValue }}
+      </md-option>
+    </md-select>
+  `
+})
+class BasicSelectWithHeader {
+  foods: any[] = [
+    { value: 'steak-0', viewValue: 'Steak' },
+    { value: 'pizza-1', viewValue: 'Pizza' },
+    { value: 'tacos-2', viewValue: 'Tacos' },
+    { value: 'sandwich-3', viewValue: 'Sandwich' },
+    { value: 'chips-4', viewValue: 'Chips' },
+    { value: 'eggs-5', viewValue: 'Eggs' },
+    { value: 'pasta-6', viewValue: 'Pasta' },
+    { value: 'sushi-7', viewValue: 'Sushi' },
+  ];
+  control = new FormControl();
+  isRequired: boolean;
 
   @ViewChild(MdSelect) select: MdSelect;
   @ViewChildren(MdOption) options: QueryList<MdOption>;

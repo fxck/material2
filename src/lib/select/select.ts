@@ -1,6 +1,7 @@
 import {
   AfterContentInit,
   Component,
+  ContentChild,
   ContentChildren,
   ElementRef,
   EventEmitter,
@@ -16,6 +17,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import {MdOption, MdOptionSelectEvent} from '../core/option/option';
+import {MdSelectHeader} from './select-header';
 import {ENTER, SPACE} from '../core/keyboard/keycodes';
 import {FocusKeyManager} from '../core/a11y/focus-key-manager';
 import {Dir} from '../core/rtl/dir';
@@ -72,6 +74,10 @@ export const SELECT_PANEL_VIEWPORT_PADDING = 8;
 export class MdSelectChange {
   constructor(public source: MdSelect, public value: any) { }
 }
+
+/** Counter for unique panel IDs. */
+let panelIds = 0;
+
 
 @Component({
   moduleId: module.id,
@@ -154,6 +160,9 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   /** The IDs of child options to be passed to the aria-owns attribute. */
   _optionIds: string = '';
 
+  /** Unique ID for the panel element. Useful for a11y in projected content (e.g. the header). */
+  panelId: string = 'md-select-panel-' + panelIds++;
+
   /** The value of the select panel's transform-origin property. */
   _transformOrigin: string = 'top';
 
@@ -203,6 +212,9 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
 
   /** All of the defined select options. */
   @ContentChildren(MdOption) options: QueryList<MdOption>;
+
+  /** The select's header, if specified. */
+  @ContentChild(MdSelectHeader) header: MdSelectHeader;
 
   /** Placeholder to be shown if no value has been selected. */
   @Input()
@@ -410,7 +422,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
    */
   _setScrollTop(): void {
     const scrollContainer =
-        this.overlayDir.overlayRef.overlayElement.querySelector('.mat-select-panel');
+        this.overlayDir.overlayRef.overlayElement.querySelector('.mat-select-content');
     scrollContainer.scrollTop = this._scrollTop;
   }
 
@@ -464,7 +476,8 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
         if (event.isUserInput && this._selected !== option) {
           this._emitChangeEvent(option);
         }
-        this._onSelect(option);
+
+        this._onSelect(event);
       });
       this._subscriptions.push(sub);
     });
@@ -488,12 +501,12 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   }
 
   /** When a new option is selected, deselects the others and closes the panel. */
-  private _onSelect(option: MdOption): void {
-    this._selected = option;
+  private _onSelect(event: MdOptionSelectEvent): void {
+    this._selected = event.source;
     this._updateOptions();
     this._setValueWidth();
     this._placeholderState = '';
-    if (this.panelOpen) {
+    if (this.panelOpen && event.isUserInput) {
       this.close();
     }
   }
@@ -543,9 +556,9 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   private _calculateOverlayPosition(): void {
     this._offsetX = this._isRtl() ? SELECT_PANEL_PADDING_X : -SELECT_PANEL_PADDING_X;
 
-    const panelHeight =
-        Math.min(this.options.length * SELECT_OPTION_HEIGHT, SELECT_PANEL_MAX_HEIGHT);
-    const scrollContainerHeight = this.options.length * SELECT_OPTION_HEIGHT;
+    const menuItems = this.options.length;
+    const panelHeight = Math.min(menuItems * SELECT_OPTION_HEIGHT, SELECT_PANEL_MAX_HEIGHT);
+    const scrollContainerHeight = menuItems * SELECT_OPTION_HEIGHT;
 
     // The farthest the panel can be scrolled before it hits the bottom
     const maxScroll = scrollContainerHeight - panelHeight;
@@ -562,7 +575,8 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
       // we must only adjust for the height difference between the option element
       // and the trigger element, then multiply it by -1 to ensure the panel moves
       // in the correct direction up the page.
-      this._offsetY = (SELECT_OPTION_HEIGHT - SELECT_TRIGGER_HEIGHT) / 2 * -1;
+      this._offsetY = (SELECT_OPTION_HEIGHT - SELECT_TRIGGER_HEIGHT) / 2 * -1 -
+          (this.header ? SELECT_OPTION_HEIGHT : 0);
     }
 
     this._checkOverlayWithinViewport(maxScroll);
@@ -619,7 +633,8 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
     // The final offset is the option's offset from the top, adjusted for the height
     // difference, multiplied by -1 to ensure that the overlay moves in the correct
     // direction up the page.
-    return optionOffsetFromPanelTop * -1 - SELECT_OPTION_HEIGHT_ADJUSTMENT;
+    return optionOffsetFromPanelTop * -1 - SELECT_OPTION_HEIGHT_ADJUSTMENT -
+        (this.header ? SELECT_OPTION_HEIGHT : 0);
   }
 
   /**
@@ -639,7 +654,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
     const panelHeightTop = Math.abs(this._offsetY);
     const totalPanelHeight =
         Math.min(this.options.length * SELECT_OPTION_HEIGHT, SELECT_PANEL_MAX_HEIGHT);
-    const panelHeightBottom = totalPanelHeight -  panelHeightTop - triggerRect.height;
+    const panelHeightBottom = totalPanelHeight - panelHeightTop - triggerRect.height;
 
     if (panelHeightBottom > bottomSpaceAvailable) {
       this._adjustPanelUp(panelHeightBottom, bottomSpaceAvailable);

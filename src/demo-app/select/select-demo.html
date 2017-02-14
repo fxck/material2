@@ -1,4 +1,4 @@
-<div style="height: 1000px">This div is for testing scrolled selects.</div>
+<!-- <div style="height: 1000px">This div is for testing scrolled selects.</div> -->
 <button md-button (click)="showSelect=!showSelect">SHOW SELECT</button>
 <div class="demo-select">
   <div *ngIf="showSelect">
@@ -42,6 +42,21 @@
       <p> Change event value: {{ latestChangeEvent?.value }} </p>
     </md-card>
   </div>
+
+  <md-card *ngIf="showSelect">
+    <md-select placeholder="Drink" [(ngModel)]="currentDrink" #selectWitHeader="mdSelect">
+      <md-select-header>
+        <input type="search" [(ngModel)]="searchTerm" role="combobox" [attr.aria-owns]="selectWitHeader.panelId"
+          (ngModelChange)="filterDrinks()" placeholder="Search for a drink"/>
+      </md-select-header>
+
+      <md-option *ngFor="let drink of filteredDrinks" [value]="drink.value" [disabled]="drink.disabled">
+        {{ drink.viewValue }}
+      </md-option>
+
+    </md-select>
+  </md-card>
+
 
 </div>
 <div style="height: 500px">This div is for testing scrolled selects.</div>

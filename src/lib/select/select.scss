@@ -119,10 +119,8 @@ $mat-select-trigger-font-size: 16px !default;
   margin: 0 $mat-select-arrow-margin;
 }
 
-.mat-select-panel {
-  @include mat-menu-base();
-  padding-top: 0;
-  padding-bottom: 0;
+.mat-select-content {
+  @include mat-menu-scrollable();
   max-height: $mat-select-panel-max-height;
 
   @include cdk-high-contrast {
@@ -130,3 +128,23 @@ $mat-select-trigger-font-size: 16px !default;
   }
 }
 
+.mat-select-panel {
+  @include mat-menu-base();
+  border: none;
+}
+
+.mat-select-header {
+  @include mat-menu-item-base();
+  border-bottom: solid 1px;
+  box-sizing: border-box;
+
+  input {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    padding: 0;
+    background: transparent;
+  }
+}
