@@ -19,7 +19,7 @@
     "docs": "gulp docs",
     "api": "gulp api"
   },
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "license": "MIT",
   "engines": {
     "node": ">= 5.4.1 < 7"
@@ -44,7 +44,7 @@
     "@types/glob": "^5.0.30",
     "@types/gulp": "^3.8.32",
     "@types/hammerjs": "^2.0.34",
-    "@types/jasmine": "^2.5.41",
+    "@types/jasmine": "2.5.41",
     "@types/merge2": "^0.3.29",
     "@types/minimist": "^1.2.0",
     "@types/node": "^7.0.4",
