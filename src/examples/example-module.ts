@@ -69,6 +69,7 @@ import {SelectOverviewExample} from './select-overview/select-overview-example';
 import {ChipsOverviewExample} from './chips-overview/chips-overview-example';
 import {ChipsStackedExample} from './chips-stacked/chips-stacked-example';
 import {SelectFormExample} from './select-form/select-form-example';
+import {SelectHeaderExample} from './select-header/select-header-example';
 
 
 export interface LiveExample {
@@ -142,6 +143,7 @@ export const EXAMPLE_COMPONENTS = {
   'radio-overview': {title: 'Basic radios', component: RadioOverviewExample},
   'select-overview': {title: 'Basic select', component: SelectOverviewExample},
   'select-form': {title: 'Select in a form', component: SelectFormExample},
+  'select-header': {title: 'Select header', component: SelectHeaderExample},
   'sidenav-fab': {title: 'Sidenav with a FAB', component: SidenavFabExample},
   'sidenav-overview': {title: 'Basic sidenav', component: SidenavOverviewExample},
   'slider-configurable': {title: 'Configurable slider', component: SliderConfigurableExample},
@@ -204,6 +206,7 @@ export const EXAMPLE_LIST = [
   SidenavFabExample,
   SelectOverviewExample,
   SelectFormExample,
+  SelectHeaderExample,
   SidenavOverviewExample,
   SliderConfigurableExample,
   SliderOverviewExample,
