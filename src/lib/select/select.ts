@@ -556,9 +556,9 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   private _calculateOverlayPosition(): void {
     this._offsetX = this._isRtl() ? SELECT_PANEL_PADDING_X : -SELECT_PANEL_PADDING_X;
 
-    const menuItems = this.options.length;
-    const panelHeight = Math.min(menuItems * SELECT_OPTION_HEIGHT, SELECT_PANEL_MAX_HEIGHT);
-    const scrollContainerHeight = menuItems * SELECT_OPTION_HEIGHT;
+    const panelHeight =
+        Math.min(this.options.length * SELECT_OPTION_HEIGHT, SELECT_PANEL_MAX_HEIGHT);
+    const scrollContainerHeight = this.options.length * SELECT_OPTION_HEIGHT;
 
     // The farthest the panel can be scrolled before it hits the bottom
     const maxScroll = scrollContainerHeight - panelHeight;
