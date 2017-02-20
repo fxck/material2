@@ -992,37 +992,42 @@ describe('MdSelect', () => {
         select.style.marginRight = '20px';
       });
 
-      it('should align the trigger and the selected option on the x-axis in ltr', () => {
+      it('should align the trigger and the selected option on the x-axis in ltr', async(() => {
         trigger.click();
         fixture.detectChanges();
 
-        const triggerLeft = trigger.getBoundingClientRect().left;
-        const firstOptionLeft =
-            document.querySelector('.cdk-overlay-pane md-option').getBoundingClientRect().left;
+        fixture.whenStable().then(() => {
+          const triggerLeft = trigger.getBoundingClientRect().left;
+          const firstOptionLeft =
+              document.querySelector('.cdk-overlay-pane md-option').getBoundingClientRect().left;
 
-        // Each option is 32px wider than the trigger, so it must be adjusted 16px
-        // to ensure the text overlaps correctly.
-        expect(firstOptionLeft.toFixed(2))
-            .toEqual((triggerLeft - 16).toFixed(2),
-                `Expected trigger to align with the selected option on the x-axis in LTR.`);
-      });
+          // Each option is 32px wider than the trigger, so it must be adjusted 16px
+          // to ensure the text overlaps correctly.
+          expect(firstOptionLeft.toFixed(2))
+              .toEqual((triggerLeft - 16).toFixed(2),
+                  `Expected trigger to align with the selected option on the x-axis in LTR.`);
+        });
+      }));
 
-      it('should align the trigger and the selected option on the x-axis in rtl', () => {
+      it('should align the trigger and the selected option on the x-axis in rtl', async(() => {
         dir.value = 'rtl';
 
         trigger.click();
         fixture.detectChanges();
 
-        const triggerRight = trigger.getBoundingClientRect().right;
-        const firstOptionRight =
-            document.querySelector('.cdk-overlay-pane md-option').getBoundingClientRect().right;
+        fixture.whenStable().then(() => {
+          const triggerRight = trigger.getBoundingClientRect().right;
+          const firstOptionRight =
+              document.querySelector('.cdk-overlay-pane md-option').getBoundingClientRect().right;
 
-        // Each option is 32px wider than the trigger, so it must be adjusted 16px
-        // to ensure the text overlaps correctly.
-        expect(firstOptionRight.toFixed(2))
-            .toEqual((triggerRight + 16).toFixed(2),
-                `Expected trigger to align with the selected option on the x-axis in RTL.`);
-      });
+          // Each option is 32px wider than the trigger, so it must be adjusted 16px
+          // to ensure the text overlaps correctly.
+          expect(firstOptionRight.toFixed(2))
+              .toEqual((triggerRight + 16).toFixed(2),
+                  `Expected trigger to align with the selected option on the x-axis in RTL.`);
+        });
+      }));
+
     });
 
     describe('with header', () => {
