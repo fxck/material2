@@ -57,6 +57,36 @@
     </md-select>
   </md-card>
 
+  <md-card *ngIf="selectHeaderAsyncControl">
+    <h3>md-select-header with async search</h3>
+    <md-select placeholder="Users" [formControl]="selectHeaderAsyncControl.get('selected')">
+      <md-select-header #selectAsyncHeader>
+        <input
+          type="search"
+          [formControl]="selectHeaderAsyncControl.get('search')"
+          [attr.aria-owns]="selectAsyncHeader.panelId"
+          placeholder="Search for a github User"
+        />
+      </md-select-header>
+
+      <md-option *ngFor="let user of users$ | async" [value]="user">
+        <img
+          class="async-select-avatar  mat-elevation-z2"
+          [src]="user.avatar_url"
+          [alt]="user.login"
+        />
+        {{ user.login }}
+      </md-option>
+
+    </md-select>
+
+    <div *ngIf="selectHeaderAsyncControl.get('selected').value">
+      <h5>selected user:</h5>
+      <pre><code>{{ selectHeaderAsyncControl.get('selected').value | json }}</code></pre>
+    </div>
+
+  </md-card>
+
 
 </div>
 <div style="height: 500px">This div is for testing scrolled selects.</div>
